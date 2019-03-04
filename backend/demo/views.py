@@ -1,12 +1,16 @@
 from django.shortcuts import render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib import auth # avoid login, logout name conflicting
 from demo.response import response as resp
+from demo.models import Note
 
 
 # About user auth: https://docs.djangoproject.com/en/2.1/topics/auth/
 @require_POST
+@csrf_exempt
 def register(request):
     username = request.POST["username"]
     password = request.POST["password"]
@@ -17,11 +21,12 @@ def register(request):
         # FIXME: using magic number here is NOT a good idea, any better way?
 
     user = User.objects.create_user(username=username, password=password)
-    user.save() # save to database
+    user.save()  # save to database
     return resp()
 
 
 @require_POST
+@csrf_exempt
 def login(request):
     if request.user.is_authenticated:
         return resp(2)
@@ -31,7 +36,39 @@ def login(request):
 
     user = authenticate(username=username, password=password)
     if user is not None:
-        login(request, user)
-        return resp() # success
+        auth.login(request, user)
+        return resp()  # success
     else:
         return resp(3)
+
+
+@require_POST
+@csrf_exempt
+def logout(request):
+    if not request.user.is_authenticated:
+        return resp(4)
+
+    auth.logout(request)
+    return resp()
+
+
+@require_GET
+def get_notes(request):
+    if not request.user.is_authenticated:
+        return resp(4)
+
+    notes = Note.objects.filter(user=request.user).all()
+    return resp(items=notes)
+
+
+@require_POST
+@csrf_exempt
+def add_notes(request):
+    if not request.user.is_authenticated:
+        return resp(4)
+
+    content = request.POST["content"]
+
+    note = Note(content=content, user=request.user)
+    note.save()
+    return resp()
