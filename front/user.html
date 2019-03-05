@@ -46,7 +46,7 @@
 <body>
     <div id="app">
         <div id="top">
-            <div class="col-lg-6" id="wlMsg">欢迎你，{{ msg.username }}</div>
+            <div class="col-lg-6" id="wlMsg">欢迎你，{{ username }}</div>
             <div class="col-lg-6">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="note" v-model="note">
@@ -60,10 +60,11 @@
             <table class="table table-borderd table-hover table-striped">
                 <tr>
                     <th class="col-lg-8">Note</th>
-                    <th>Alter</th>
+                    <th>Created Time</th>
                 </tr>
-                <tr v-for="note in msg.notes">
-                    <td>{{note}}</td>
+                <tr v-for="item in msg">
+                    <td>{{item.content}}</td>
+                    <td>{{item.add_date}}</td>
                     <td><button class="button btn-danger" type="button" @click="del(note)">删除</button></td>
                 </tr>
             </table>
@@ -76,24 +77,28 @@
         el: '#app',
         data: {
             // 从服务器返回的数据,模拟数据
-            msg: {
+            msg: [
                 // username: 'zs',
                 // notes: [
                 //     "note1",
                 //     "note2",
                 //     "note3"
                 // ]
-            },
+            ],
+            username: '',
             note: ''
         },
         methods: {
             add() {
-                this.msg.notes.push(this.note)
-                axios.get(`./api/addNote/?username=${this.msg.username}&note=${this.note}`)         // 在这里填写自己的api
+                axios.post('/add_notes', {
+                    content: this.note
+                })         // 在这里填写自己的api
                     .then(res => {
-                        alert("添加成功")
-                    }).catch(err => {
-                        console.log(err)
+                        if (res.code != 0) {
+                            console.log(res.msg)
+                            return
+                        }
+                        this.msg.notes.push(this.note)
                     })
                 this.note = ''
             },
@@ -103,22 +108,30 @@
                 if (index != -1)
                     this.msg.notes.splice(index, 1)
                 axios.get(`./api/delNote/?username=${this.msg.username}&delnote=${note}`)         // 在这里填写自己的api
-                .then(res => {
-                    alert("删除成功")
-                }).catch(err => {
-                    console.log(err)
-                })
+                    .then(res => {
+                        alert("删除成功")
+                    }).catch(err => {
+                        console.log(err)
+                    })
             }
         },
         mounted() {
-            // 从服务器获取数据，第一个参数是url,你测试的时候可以修改里面的内容，
-            axios.get('/user.json')
-                .then((response) => {
-                    this.msg = response.data
+            // 获取用户名
+            var search = window.location.search
+            var index = search.indexOf("=")
+            var username = search.slice(index + 1)
+            console.log(username)
+            this.username = username
+            // 从服务器获取数据，第一个参数是url,你测试的时候可以修改里面的内容，   
+            axios.get('/get_notes')
+                .then(res => {
+                    if (res.code != 0) {
+                        console.log(res.msg)
+                        return
+                    }
+                    this.msg = res.items
                 })
-                .catch((error) => {
-                    console.log(error)
-                });
+
         }
     })
 </script>
