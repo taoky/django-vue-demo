@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome</title>
+    <script src="vue2.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        #body {
+            margin: 30px;
+        }
+
+        #app {
+            width: 900px;
+            margin: auto;
+            padding-top: 40px;
+        }
+
+        #app #top #add {
+            float: right;
+        }
+
+        #app #wlMsg {
+            font-size: 1.3em;
+            height: 34px;
+            line-height: 34px;
+            display: inline-block;
+            margin: auto;
+        }
+
+        #note {
+            margin-top: 60px;
+        }
+
+        #note td {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="top">
+            <div class="col-lg-6" id="wlMsg">欢迎你，{{ username }}</div>
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="note" v-model="note">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" @click="add()">Add</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+        </div>
+        <div id="note">
+            <table class="table table-borderd table-hover table-striped">
+                <tr>
+                    <th class="col-lg-8">Note</th>
+                    <th>Created Time</th>
+                </tr>
+                <tr v-for="item in msg">
+                    <td>{{item.content}}</td>
+                    <td>{{item.add_date}}</td>
+                    <td><button class="button btn-danger" type="button" @click="del(note)">删除</button></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            // 从服务器返回的数据,模拟数据
+            msg: [
+                // username: 'zs',
+                // notes: [
+                //     "note1",
+                //     "note2",
+                //     "note3"
+                // ]
+            ],
+            username: '',
+            note: ''
+        },
+        methods: {
+            add() {
+                axios.post('/add_notes', {
+                    content: this.note
+                })         // 在这里填写自己的api
+                    .then(res => {
+                        if (res.code != 0) {
+                            console.log(res.msg)
+                            return
+                        }
+                        this.msg.notes.push(this.note)
+                    })
+                this.note = ''
+            },
+            del(note) {
+                console.log(note)
+                var index = this.msg.notes.indexOf(note)
+                if (index != -1)
+                    this.msg.notes.splice(index, 1)
+                axios.get(`./api/delNote/?username=${this.msg.username}&delnote=${note}`)         // 在这里填写自己的api
+                    .then(res => {
+                        alert("删除成功")
+                    }).catch(err => {
+                        console.log(err)
+                    })
+            }
+        },
+        mounted() {
+            // 获取用户名
+            var search = window.location.search
+            var index = search.indexOf("=")
+            var username = search.slice(index + 1)
+            console.log(username)
+            this.username = username
+            // 从服务器获取数据，第一个参数是url,你测试的时候可以修改里面的内容，   
+            axios.get('/get_notes')
+                .then(res => {
+                    if (res.code != 0) {
+                        console.log(res.msg)
+                        return
+                    }
+                    this.msg = res.items
+                })
+
+        }
+    })
+</script>
+
+</html>

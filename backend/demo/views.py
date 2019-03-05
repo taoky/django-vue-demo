@@ -12,37 +12,41 @@ import json
 
 
 # About user auth: https://docs.djangoproject.com/en/2.1/topics/auth/
-@require_POST
 @csrf_exempt
 def register(request):
-    username = request.POST["username"]
-    password = request.POST["password"]
+    if request.method == 'post':
+        username = request.POST["username"]
+        password = request.POST["password"]
 
-    if User.objects.filter(username=username).exists():
-        # We don't want a same user register twice!
-        return resp(1)
-        # FIXME: using magic number here is NOT a good idea, any better way?
+        if User.objects.filter(username=username).exists():
+            # We don't want a same user register twice!
+            return resp(1)
+            # FIXME: using magic number here is NOT a good idea, any better way?
 
-    user = User.objects.create_user(username=username, password=password)
-    user.save()  # save to database
-    return resp()
+        user = User.objects.create_user(username=username, password=password)
+        user.save()  # save to database
+        return resp()
+    else:
+        return render(request, 'signUp.html')
 
 
-@require_POST
 @csrf_exempt
 def login(request):
-    if request.user.is_authenticated:
-        return resp(2)
+    if request.method == 'post':
+        if request.user.is_authenticated:
+            return resp(2)
 
-    username = request.POST["username"]
-    password = request.POST["password"]
+        username = request.POST["username"]
+        password = request.POST["password"]
 
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        auth.login(request, user)
-        return resp()  # success
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+            return resp()  # success
+        else:
+            return resp(3)
     else:
-        return resp(3)
+        return render(request, 'signIn.html')
 
 
 @require_POST
@@ -78,3 +82,7 @@ def add_notes(request):
     note = Note.objects.create(content=content, user=request.user)
     note.save()
     return resp()
+
+
+def index(request):
+    return render(request, 'user.html')
