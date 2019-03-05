@@ -4,8 +4,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib import auth # avoid login, logout name conflicting
+from django.core import serializers
+
 from demo.response import response as resp
 from demo.models import Note
+import json
 
 
 # About user auth: https://docs.djangoproject.com/en/2.1/topics/auth/
@@ -58,6 +61,9 @@ def get_notes(request):
         return resp(4)
 
     notes = Note.objects.filter(user=request.user).all()
+    # https://docs.djangoproject.com/en/2.1/topics/serialization/#serialization-formats-json
+    notes = json.loads(serializers.serialize("json", notes, fields=("content", "add_date")))
+    notes = [i["fields"] for i in sorted(notes, key=lambda k: k["pk"])]
     return resp(items=notes)
 
 
@@ -69,6 +75,6 @@ def add_notes(request):
 
     content = request.POST["content"]
 
-    note = Note(content=content, user=request.user)
+    note = Note.objects.create(content=content, user=request.user)
     note.save()
     return resp()

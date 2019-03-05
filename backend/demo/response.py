@@ -10,4 +10,6 @@ def response(code=0, msg="", **kwargs):
         msg = "Wrong username or password!"
     elif code == 4:
         msg = "Please login first!"
-    return JsonResponse({**{"code": code, "msg": msg}, **kwargs})
+    ret = {**{"code": code, "msg": msg}, **kwargs}
+    # print(ret)
+    return JsonResponse(ret)
