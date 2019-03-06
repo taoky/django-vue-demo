@@ -47,6 +47,7 @@
     <div id="app">
         <div id="top">
             <div class="col-lg-6" id="wlMsg">欢迎你，[[ username ]]</div>
+            <button class="btn btn-default" type="button" @click="logout()">Logout</button>
             <div class="col-lg-6">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="note" v-model="note">
@@ -93,37 +94,41 @@
             add() {
                 axios.post('/add_notes', {
                     content: this.note
-                })         // 在这里填写自己的api
-                    .then(res => {
-                        if (res.data.code != 0) {
-                            console.log(res.data.msg)
+                }).then(res => {
+                        if (res.data.code !== 0) {
+                            console.log(res.data.msg);
                             return
                         }
-                        this.msg.notes.push(this.note)
-                    })
-                this.note = ''
+                        this.msg.push(
+                            {
+                                "content": this.note,
+                                "add_date": res.data.add_date
+                            }
+                        );
+                        this.note = '';
+                });
+
             },
-            {#del(note) {#}
-            {#    console.log(note)#}
-            {#    var index = this.msg.notes.indexOf(note)#}
-            {#    if (index != -1)#}
-            {#        this.msg.notes.splice(index, 1)#}
-            {#    axios.get(`./api/delNote/?username=${this.msg.username}&delnote=${note}`)         // 在这里填写自己的api#}
-            {#        .then(res => {#}
-            {#            alert("删除成功")#}
-            {#        }).catch(err => {#}
-            {#            console.log(err)#}
-            {#        })#}
-            {#}#}
+            logout() {
+                axios.post('logout')
+                    .then(res => {
+                        if(res.data.code !== 0){
+                            console.log(res.data.msg);
+                            return
+                        }
+                        console.log("logout....");
+                        window.location.reload(false)
+                    })
+            },
         },
         mounted() {
             axios.get('/get_notes')
                 .then(res => {
-                    if (res.data.code != 0) {
-                        console.log(res.data.msg)
+                    if (res.data.code !== 0) {
+                        console.log(res.data.msg);
                         return
                     }
-                    this.msg = res.data.items
+                    this.msg = res.data.items;
                     this.username = res.data.username
                 })
 

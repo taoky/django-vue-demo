@@ -85,7 +85,7 @@ def add_notes(request):
 
     note = Note.objects.create(content=content, user=request.user)
     note.save()
-    return resp()
+    return resp(add_date=note.add_date)
 
 
 @login_required(login_url="/login")
