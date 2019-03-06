@@ -11,5 +11,5 @@ urlpatterns = [
     path('logout', views.logout),
     path('get_notes', views.get_notes),
     path('add_notes', views.add_notes),
-    path('', TemplateView.as_view(template_name="user.html")),
+    path('', views.index),
 ]

@@ -16,8 +16,9 @@ import json
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
-        username = request.POST["username"]
-        password = request.POST["password"]
+        req = json.loads(request.body)
+        username = req["username"]
+        password = req["password"]
 
         if User.objects.filter(username=username).exists():
             # We don't want a same user register twice!
@@ -33,13 +34,15 @@ def register(request):
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
-        if request.user.is_authenticated:
-            return resp(2)
-
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        req = json.loads(request.body)
+        username = req['username']
+        password = req['password']
 
         user = authenticate(username=username, password=password)
+
+        if request.user.is_authenticated and request.user.id == user.id:
+            auth.logout(request)
+
         if user is not None:
             auth.login(request, user)
             return resp()  # success
@@ -77,7 +80,8 @@ def add_notes(request):
     if not request.user.is_authenticated:
         return resp(4)
 
-    content = request.POST["content"]
+    req = json.loads(request.body)
+    content = req["content"]
 
     note = Note.objects.create(content=content, user=request.user)
     note.save()

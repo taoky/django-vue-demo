@@ -106,11 +106,11 @@
                         username: this.username,
                         password: this.password
                     }).then(res => {
-                        if (res.code != 0) {
-                            console.log(res.msg);
+                        if (res.data.code != 0) {
+                            console.log(res.data.msg);
                             return;
                         }
-                        window.location.href = `/user.html?username=${this.username}`
+                        window.location.href = `/`
                     })
                 }
             }
