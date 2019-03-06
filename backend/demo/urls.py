@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.views.generic import TemplateView
 
 
 # See https://docs.djangoproject.com/en/2.1/topics/http/urls/
@@ -10,5 +11,5 @@ urlpatterns = [
     path('logout', views.logout),
     path('get_notes', views.get_notes),
     path('add_notes', views.add_notes),
-    path('', views.index),
+    path('', TemplateView.as_view(template_name="user.html")),
 ]
