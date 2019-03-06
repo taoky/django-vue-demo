@@ -34,39 +34,39 @@ class DemoTests(TestCase):
 
     def test_register_and_login_normal(self):
         c = Client()
-        res = c.post('/demo/register', {"username": "aaa", "password": "666"})
+        res = c.post('/register', {"username": "aaa", "password": "666"})
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
 
-        res = c.post('/demo/login', {"username": "aaa", "password": "666"})
+        res = c.post('/login', {"username": "aaa", "password": "666"})
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
 
     def test_login_logout_normal(self):
         c = Client()
-        res = c.post('/demo/login', {"username": "taoky", "password": "123456"})
+        res = c.post('/login', {"username": "taoky", "password": "123456"})
 
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
 
-        res = c.post("/demo/logout")
+        res = c.post("/logout")
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
 
     def test_logout_without_login(self):
         c = Client()
-        res = c.post("/demo/logout")
+        res = c.post("/logout")
         res = json_decode(res)
         self.assertEqual(res["code"], 4)
 
     def test_get_notes(self):
         c = Client()
-        c.post('/demo/login', {"username": "taoky", "password": "123456"})
-        res = c.get('/demo/get_notes')
+        c.post('/login', {"username": "taoky", "password": "123456"})
+        res = c.get('/get_notes')
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
@@ -75,12 +75,12 @@ class DemoTests(TestCase):
 
     def test_add_notes(self):
         c = Client()
-        c.post('/demo/login', {"username": "joe", "password": "abcdefg"})
-        res = c.post('/demo/add_notes', {"content": "Naive!"})
+        c.post('/login', {"username": "joe", "password": "abcdefg"})
+        res = c.post('/add_notes', {"content": "Naive!"})
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
-        res = c.get('/demo/get_notes')
+        res = c.get('/get_notes')
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
