@@ -14,7 +14,7 @@
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="vue2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 
@@ -75,43 +75,44 @@
 
 <body>
 
-    <div id="container">
+<div id="container">
 
-        <form class="form-signin" action="/register" method="post">
-            <h2 class="form-signin-heading">Sign up</h2>
-            <label for="inputEmail" class="sr-only">Email address</label>
-            <input type="text" id="username" class="form-control" placeholder="Username" required autofocus v-model="username">
-            <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required v-model="password">
-            
-            <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="signUp">Sign Up</button>
-        </form>
+    <form class="form-signin">
+        <h2 class="form-signin-heading">Sign up</h2>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input type="text" id="username" class="form-control" placeholder="Username" required autofocus
+               v-model="username">
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required
+               v-model="password">
 
-    </div> <!-- /container -->
-    <script>
-        var vm = new Vue({
-            el:'#container',
-            data:{
-                username:'',
-                password:''
-            },
-            methods:{
-                signUp(){
-                    // window.location.href = "/user.html"
-                    axios.post('/register',{
-                        username:this.username,
-                        password:this.password
-                    }).then(res=>{
-                        if(res.code != 0){
-                            console.log(res.msg);
-                            return;
-                        }
-                        window.location.href = `/user.html?username=${this.username}`
-                    })
-                }
+        <button class="btn btn-lg btn-primary btn-block" type="submit" @click.prevent="signUp">Sign Up</button>
+    </form>
+
+</div> <!-- /container -->
+<script>
+    var vm = new Vue({
+        el: '#container',
+        data: {
+            username: '',
+            password: ''
+        },
+        methods: {
+            signUp() {
+                axios.post('/register', {
+                    username: this.username,
+                    password: this.password
+                }).then(res => {
+                    if (res.code != 0) {
+                        console.log(res.msg);
+                        return;
+                    }
+                    window.location.href = `/user.html?username=${this.username}`
+                })
             }
-        })
-    </script>
+        }
+    })
+</script>
 </body>
 
 </html>

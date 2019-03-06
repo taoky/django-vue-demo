@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
@@ -14,7 +15,7 @@ import json
 # About user auth: https://docs.djangoproject.com/en/2.1/topics/auth/
 @csrf_exempt
 def register(request):
-    if request.method == 'post':
+    if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["password"]
 
@@ -32,7 +33,7 @@ def register(request):
 
 @csrf_exempt
 def login(request):
-    if request.method == 'post':
+    if request.method == 'POST':
         if request.user.is_authenticated:
             return resp(2)
 
@@ -84,5 +85,6 @@ def add_notes(request):
     return resp()
 
 
+@login_required(login_url="/login")
 def index(request):
     return render(request, 'user.html')
