@@ -68,7 +68,7 @@ def get_notes(request):
     # https://docs.djangoproject.com/en/2.1/topics/serialization/#serialization-formats-json
     notes = json.loads(serializers.serialize("json", notes, fields=("content", "add_date")))
     notes = [i["fields"] for i in sorted(notes, key=lambda k: k["pk"])]
-    return resp(items=notes)
+    return resp(items=notes, username=request.user.username)
 
 
 @require_POST

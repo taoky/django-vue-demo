@@ -70,6 +70,7 @@ class DemoTests(TestCase):
         res = json_decode(res)
         self.assertEqual(res["code"], 0)
         self.assertEqual(res["msg"], "")
+        self.assertEqual(res["username"], "taoky")
         self.assertEqual(res["items"][0]["content"], "It's so nice")
         self.assertEqual(res["items"][1]["content"], "hahaha")
 
