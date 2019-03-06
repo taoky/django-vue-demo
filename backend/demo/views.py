@@ -3,7 +3,7 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from django.contrib import auth # avoid login, logout name conflicting
+from django.contrib import auth  # avoid login, logout name conflicting
 from django.core import serializers
 
 from demo.response import response as resp
@@ -14,14 +14,13 @@ import json
 # About user auth: https://docs.djangoproject.com/en/2.1/topics/auth/
 @csrf_exempt
 def register(request):
-    if request.method == 'post':
-        username = request.POST["username"]
-        password = request.POST["password"]
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         if User.objects.filter(username=username).exists():
             # We don't want a same user register twice!
             return resp(1)
-            # FIXME: using magic number here is NOT a good idea, any better way?
 
         user = User.objects.create_user(username=username, password=password)
         user.save()  # save to database
@@ -32,12 +31,12 @@ def register(request):
 
 @csrf_exempt
 def login(request):
-    if request.method == 'post':
+    if request.method == 'POST':
         if request.user.is_authenticated:
             return resp(2)
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(username=username, password=password)
         if user is not None:
@@ -83,6 +82,3 @@ def add_notes(request):
     note.save()
     return resp()
 
-
-def index(request):
-    return render(request, 'user.html')
